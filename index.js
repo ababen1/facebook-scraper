@@ -6,9 +6,6 @@ const readline = require('readline');
 const { google } = require('googleapis');
 const config = require('./config');
 const cookies = require('./cookies.json');
-// const josbGroupsIds = require('./jobsGroupIds.json');
-// const projectsGroupIds = require('./projectsGroupIds.json');
-// const postsDb = require('./posts.json');
 const postsDBProgrammers = require('./postsDBProgrammers.json');
 const postsDBDesigners = require('./postsDBDesigners.json');
 const postsDBSocial = require('./postsDBSocial.json');
@@ -404,7 +401,7 @@ async function scrape(page, groupLink, DB) {
             els.forEach(el => {
                 // Get post link
                 const link = el.querySelector('.qzhwtbm6:nth-child(2)')?.querySelector('a').href;
-                console.log('link:', link);
+                // console.log('link:', link);
                 // Get post time
                 const time = el.querySelector('.qzhwtbm6:nth-child(2)')?.innerText.replace("'\n \n · ", '');
                 // Remove time
@@ -442,7 +439,7 @@ async function scrape(page, groupLink, DB) {
             foundKeyWords = foundKeyWords.join(', ');
             // Generate email post
             // Add post link
-            console.log('link:', post.link);
+            // console.log('link:', post.link);
             let content = post.link + '<br>';
             // If there is time in post add it first
             content += post.time ? `${post.time}<br>` : '';
