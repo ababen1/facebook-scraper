@@ -7,7 +7,7 @@
 5.Download the credentials (credentials -> OAuth 2.0 Client IDs -> Download OAuth client) and later put it in the project folder.<br />
 6.Go to Enabled APIs & service tab -> then click on "+ ENABLE APIS AND SERVICES" and add Google Sheets API. <br />
 ## Clone project from git and install it
-7.Clone project via git -__
+7.Clone project via git -<br />
 7.1 Open cmd or terminal and write: git clone https://github.com/enterTLV/facebook-scraper.git <br />
 8. Open the new folder and write "cmd" in the folder path (url) and press enter.<br />
 8.1 In cmd under the folder path write "npm i" and wait untill the install is finished.<br />
