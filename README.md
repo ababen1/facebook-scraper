@@ -19,3 +19,6 @@
 # Running the script
 1. Enter the project folder and write "cmd" in the folder path (url).<br />
 2. in cmd wite "npm start" and wait untill scrape is completed.
+
+# If there is an error in the API delete token.json
+# If you logged out from facebook change cookies.json to [] (black array)

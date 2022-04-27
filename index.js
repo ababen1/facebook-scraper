@@ -10,13 +10,13 @@ const postsDBProgrammers = require('./postsDBProgrammers.json');
 const postsDBDesigners = require('./postsDBDesigners.json');
 const postsDBSocial = require('./postsDBSocial.json');
 const postsDBProjects = require('./postsDBProjects.json');
-const keyWords = require('./keywords.json');
+// const keyWords = require('./keywords.json');
 
 
 let postsArr = [];
 const CHUNK_SIZE = 15; // Number of posts per email
 
-const programersEmails = [];
+const programmersEmails = [];
 const designersEmails = [];
 const socialEmails = [];
 
@@ -24,6 +24,11 @@ const programmersGroups = [];
 const designersGroups = [];
 const socialGroups = [];
 const projectsGroups = [];
+
+const programmersKeywords = [];
+const designersKeyWords = [];
+const socialKeywords = [];
+const projectsKeywords = [];
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
@@ -46,6 +51,7 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
+    console.log("authorize");
     const { client_secret, client_id, redirect_uris } = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
         client_id, client_secret, redirect_uris[0]);
@@ -65,6 +71,7 @@ function authorize(credentials, callback) {
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
 function getNewToken(oAuth2Client, callback) {
+    console.log("getNewToken");
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
@@ -102,14 +109,14 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'רשומים למציאת עבודה - מתכנתים!B2:B',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Programmers Emails:');
                 rows.forEach(row => {
-                    programersEmails.push(row[0]);
+                    programmersEmails.push(row[0]);
                 })
-                console.log(programersEmails);
+                console.log(programmersEmails);
                 resolve();
             } else {
                 reject('No programmers emails found.');
@@ -125,7 +132,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'רשומים למציאת עבודה - מעצבים!B2:B',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Designers Emails:');
@@ -147,7 +154,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'רשומים למציאת עבודה - סושיאל ושיווק!B2:B',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Social Emails:');
@@ -170,7 +177,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'קבוצות מציאת עבודה - הייטק!A4:A',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Programmers groups:');
@@ -192,7 +199,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'קבוצות מציאת עובדה - מעצבים!A4:A',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Designers groups:');
@@ -214,7 +221,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'קבוצות מציאת עבודה - סושיאל!A4:A',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Social groups:');
@@ -236,7 +243,7 @@ async function getDataFromSheets(auth) {
             spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
             range: 'קבוצות מציאת פרוייקטים!A4:A',
         }, (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
+            if (err) reject('The API returned an error: ' + err);
             const rows = res.data.values;
             if (rows && rows.length) {
                 console.log('Projects groups:');
@@ -247,6 +254,94 @@ async function getDataFromSheets(auth) {
                 resolve();
             } else {
                 reject('No projects groups found.');
+            }
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+    // Get projects keywords
+    await new Promise((resolve, reject) => {
+        sheets.spreadsheets.values.get({
+            spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
+            range: 'מילות מפתח!A2:A',
+        }, (err, res) => {
+            if (err) reject('The API returned an error: ' + err);
+            const rows = res.data.values;
+            if (rows && rows.length) {
+                console.log('Projects keywords:');
+                rows.forEach(row => {
+                    projectsKeywords.push(row[0]);
+                })
+                console.log(projectsKeywords);
+                resolve();
+            } else {
+                reject('No projects keywords found.');
+            }
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+    // Get programmers keywords
+    await new Promise((resolve, reject) => {
+        sheets.spreadsheets.values.get({
+            spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
+            range: 'מילות מפתח!B2:B',
+        }, (err, res) => {
+            if (err) reject('The API returned an error: ' + err);
+            const rows = res.data.values;
+            if (rows && rows.length) {
+                console.log('Programmers keywords:');
+                rows.forEach(row => {
+                    programmersKeywords.push(row[0]);
+                })
+                console.log(programmersKeywords);
+                resolve();
+            } else {
+                reject('No programmers keyWords found.');
+            }
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+    // Get designers keywords
+    await new Promise((resolve, reject) => {
+        sheets.spreadsheets.values.get({
+            spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
+            range: 'מילות מפתח!C2:C',
+        }, (err, res) => {
+            if (err) reject('The API returned an error: ' + err);
+            const rows = res.data.values;
+            if (rows && rows.length) {
+                console.log('Designers keywords:');
+                rows.forEach(row => {
+                    designersKeyWords.push(row[0]);
+                })
+                console.log(designersKeyWords);
+                resolve();
+            } else {
+                reject('No designers keyWords found.');
+            }
+        });
+    }).catch((error) => {
+        console.error(error);
+    });
+    // Get social keywords
+    await new Promise((resolve, reject) => {
+        sheets.spreadsheets.values.get({
+            spreadsheetId: '13zCT1ubfOCAejVlr5UwQNSp1XK3v3aiSopWkxjVLJp0',
+            range: 'מילות מפתח!D2:D',
+        }, (err, res) => {
+            if (err) reject('The API returned an error: ' + err);
+            const rows = res.data.values;
+            if (rows && rows.length) {
+                console.log('Social keywords:');
+                rows.forEach(row => {
+                    socialKeywords.push(row[0]);
+                })
+                console.log(socialKeywords);
+                resolve();
+            } else {
+                reject('No social keyWords found.');
             }
         });
     }).catch((error) => {
@@ -270,13 +365,13 @@ async function start() {
         // If we want to scrape in infinite loop uncomment this line
         // setInterval(startScraper, 60 * 1000 * 10, page);
         if (programmersGroups.length)
-            await startScraper(page, programmersGroups, postsDBProgrammers, 'programmers', 'בוט משרות פייסבוק: $ משרות חדשות', programersEmails);
+            await startScraper(page, programmersGroups, postsDBProgrammers, 'programmers', 'בוט משרות פייסבוק: $ משרות חדשות', programmersEmails, programmersKeywords);
         if (designersGroups.length)
-            await startScraper(page, designersGroups, postsDBDesigners, 'designers', 'בוט משרות פייסבוק: $ משרות חדשות', designersEmails);
+            await startScraper(page, designersGroups, postsDBDesigners, 'designers', 'בוט משרות פייסבוק: $ משרות חדשות', designersEmails, designersKeyWords);
         if (socialGroups.length)
-            await startScraper(page, socialGroups, postsDBSocial, 'social', 'בוט משרות פייסבוק: $ משרות חדשות', socialEmails);
+            await startScraper(page, socialGroups, postsDBSocial, 'social', 'בוט משרות פייסבוק: $ משרות חדשות', socialEmails, socialKeywords);
         if (projectsGroups.length)
-            await startScraper(page, projectsGroups, postsDBProjects, 'projects', 'בוט פרוייקטים פייסבוק: $ פרוייקטים חדשות', ['shahar.mesh@gmail.com', 'livne@s-tov.org.il']);
+            await startScraper(page, projectsGroups, postsDBProjects, 'projects', 'בוט פרוייקטים פייסבוק: $ פרוייקטים חדשות', ['shahar.mesh@gmail.com', 'livne@s-tov.org.il'], projectsKeywords);
     } else {
         /* Go to facebook */
         await page.goto('https://www.facebook.com/login/', { waitUntill: 'networkidle0' });
@@ -294,13 +389,13 @@ async function start() {
             await page.waitFor('[data-click="profile_icon"]');
             // setInterval(startScraper, 60 * 1000 * 12, page);
             if (programmersGroups.length)
-                await startScraper(page, programmersGroups, postsDBProgrammers, 'programmers', 'בוט משרות פייסבוק: $ משרות חדשות', programersEmails);
-            if (designersGroups.length)
-                await startScraper(page, designersGroups, postsDBDesigners, 'designers', 'בוט משרות פייסבוק: $ משרות חדשות', designersEmails);
-            if (socialGroups.length)
-                await startScraper(page, socialGroups, postsDBSocial, 'social', 'בוט משרות פייסבוק: $ משרות חדשות', socialEmails);
-            if (projectsGroups.length)
-                await startScraper(page, projectsGroups, postsDBProjects, 'projects', 'בוט פרוייקטים פייסבוק: $ פרוייקטים חדשות', ['shahar.mesh@gmail.com', 'livne@s-tov.org.il']);
+            await startScraper(page, programmersGroups, postsDBProgrammers, 'programmers', 'בוט משרות פייסבוק: $ משרות חדשות', programmersEmails, programmersKeywords);
+        if (designersGroups.length)
+            await startScraper(page, designersGroups, postsDBDesigners, 'designers', 'בוט משרות פייסבוק: $ משרות חדשות', designersEmails, designersKeyWords);
+        if (socialGroups.length)
+            await startScraper(page, socialGroups, postsDBSocial, 'social', 'בוט משרות פייסבוק: $ משרות חדשות', socialEmails, socialKeywords);
+        if (projectsGroups.length)
+            await startScraper(page, projectsGroups, postsDBProjects, 'projects', 'בוט פרוייקטים פייסבוק: $ פרוייקטים חדשות', ['shahar.mesh@gmail.com', 'livne@s-tov.org.il'], projectsKeywords);
         } catch (error) {
             console.log('Faild to login');
         }
@@ -314,11 +409,11 @@ async function start() {
 
 };
 
-async function startScraper(page, groupsLinks, DB, DBName, subject, emails) {
+async function startScraper(page, groupsLinks, DB, DBName, subject, emails, keywords) {
     await new Promise(async (resolve, reject) => {
         for (const groupLink of groupsLinks) {
             try {
-                await scrape(page, groupLink, DB);
+                await scrape(page, groupLink, DB, keywords);
             } catch (e) {
                 console.log(e, groupLink);
                 //await scrape(page, groupLink, DB);
@@ -369,7 +464,7 @@ async function startScraper(page, groupsLinks, DB, DBName, subject, emails) {
     })
 }
 
-async function scrape(page, groupLink, DB) {
+async function scrape(page, groupLink, DB, keywords) {
     var posts;
     try {
         /* Go to group */
@@ -431,12 +526,12 @@ async function scrape(page, groupLink, DB) {
         if (!DB[hash]) {
             DB[hash] = post.result;
             // Find keywoerds
-            let foundKeyWords = []
-            keyWords.forEach(keyword => {
+            let foundKeywords = []
+            keywords.forEach(keyword => {
                 if (post.result.toLowerCase().includes(keyword))
-                    foundKeyWords.push(keyword);
+                foundKeywords.push(keyword);
             })
-            foundKeyWords = foundKeyWords.join(', ');
+            foundKeywords = foundKeywords.join(', ');
             // Generate email post
             // Add post link
             // console.log('link:', post.link);
@@ -444,7 +539,7 @@ async function scrape(page, groupLink, DB) {
             // If there is time in post add it first
             content += post.time ? `${post.time}<br>` : '';
             // Add the content of the post
-            content += `${foundKeyWords.length ? 'מילות מפתח שנמצאו: <b>' + foundKeyWords + '</b>' : ''} <br> ${post.result}`;
+            content += `${foundKeywords.length ? 'מילות מפתח שנמצאו: <b>' + foundKeywords + '</b>' : ''} <br> ${post.result}`;
             // Add post to array;
             postsArr.unshift(content);
         }
