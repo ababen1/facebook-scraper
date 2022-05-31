@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_BOT_NUMBER = 'whatsapp:+14155238886';
