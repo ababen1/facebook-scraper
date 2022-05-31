@@ -1,9 +1,14 @@
-const TWILIO_ACCOUNT_SID = "ACb12533796453cde5c5fdcaddeffa3f67";
-const TWILIO_AUTH_TOKEN = "210551e9d514e1bff4e29929ac92d953";
+require('dotenv').config();
+
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_BOT_NUMBER = 'whatsapp:+14155238886';
-const SENDER_NUMBER = TWILIO_BOT_NUMBER;
+const LIVNE_PHONE_NUMBER = process.env.LIVNE_PHONE_NUMBERr;
+const SENDER_NUMBER = LIVNE_PHONE_NUMBER;
 
 const client = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+
+send_message(validate_phone_number("0525563127"), "shalom")
 
 function send_message(recipent, content) {
     client.messages.create({
